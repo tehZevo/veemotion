@@ -1,1 +1,5 @@
 git+https://github.com/tehzevo/joycontrol
+pyyaml
+evdev
+munch
+numpy

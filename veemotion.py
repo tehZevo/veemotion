@@ -1,35 +1,73 @@
-#!/usr/bin/env python3
-
-#based off of https://github.com/Poohl/joycontrol
-
 import argparse
 import asyncio
-import logging
-import os
 
-from aioconsole import ainput
+from evdev import ecodes
+from munch import munchify
+import yaml
+import numpy as np #TODO: remove?
 
-import joycontrol.debug as debug
-from joycontrol import logging_default as log, utils
-from joycontrol.command_line_interface import ControllerCLI
-from joycontrol.controller import Controller
-from joycontrol.controller_state import ControllerState, button_push, button_press, button_release
-from joycontrol.memory import FlashMemory
 from joycontrol.protocol import controller_protocol_factory
 from joycontrol.server import create_hid_server
-from joycontrol.transport import NotConnectedError
+from joycontrol.memory import FlashMemory
+from joycontrol.controller import Controller
 
-logger = logging.getLogger(__name__)
+from mkb_listener import MKBListener
+
+with open("config.yaml", "r") as f:
+    config = munchify(yaml.safe_load(f))
+
+#TODO: how to automatically reconnect if disconnected?
+#   await controller_state.connect() doesn't seem to work (maybe just returns if already connected once, even if currently disconnected?)
+
+#TODO: see if we can reconnect without repairing by pressing l+r on the change grip/order screen
+
+#TODO: cli args
+#TODO: reconnect_bt_addr
+#   if not found in config, start server in pair mode with None
+#   once paired, save to config
+#TODO: custom(izeable) pro controller color ;^) (modify default flash memory bytes)
+
+#TODO: grab devices once stuff works
+
+#meh
+def find_button(code, obj):
+    for key, value in obj.items():
+        if ecodes.ecodes[key] == code:
+            return value
+    return None
 
 async def veemotion(controller_state):
-    # waits until controller is fully connected
+
+    def on_key_down(code):
+        print(code, "down")
+        if code == ecodes.KEY_ESC:
+            listener.ungrab_devices()
+            exit(0)
+
+        button = find_button(code, config.buttons)
+        if button is not None:
+            print("got", code, "pressing", button)
+            controller_state.button_state.set_button(button, True)
+
+    def on_key_up(code):
+        print(code, "up")
+        button = find_button(code, config.buttons)
+        if button is not None:
+            print("got", code, "pressing", button)
+            controller_state.button_state.set_button(button, True)
+
+    listener = MKBListener(on_key_down, on_key_up, grab_devices=False)
+    listener.listen()
+
+    # wait for connection
     await controller_state.connect()
 
     while True:
-        print("hello veemo")
-        await asyncio.sleep(1)
-        print("goodby veemo")
-        controller_state.button_state.set_button("b", True)
+        delta = np.array(listener.get_mouse_delta())
+        delta = delta * config.motion.sensitivity
+        delta = np.clip(delta, -2000, 2000)
+        print(delta)
+        controller_state.imu_state.set_imu(0, 0, 0, 0, delta[1], delta[0])
 
         try:
             await controller_state.send()
@@ -37,62 +75,27 @@ async def veemotion(controller_state):
             #attempt reconnect if disconnected
             logger.info('Connection was lost.')
             logger.info("Please open the Change Grip/Order screen to reconnect...")
+            #TODO: how to reconnect? this might just return true if previously connected
             await controller_state.connect()
             logger.info("Connection re-established.")
 
-CONTROLLER_TYPE = "PRO_CONTROLLER"
+async def main(args):
+    factory = controller_protocol_factory(Controller.PRO_CONTROLLER, spi_flash=FlashMemory())
+    transport, protocol = await create_hid_server(factory, interactive=True)
+    controller_state = protocol.get_controller_state()
 
-async def _main(args):
-    # Get controller name to emulate from arguments
-    controller = Controller.from_arg(CONTROLLER_TYPE)
+    try:
+        await veemotion(controller_state)
+    except Exception as e:
+        print(e)
+        print("TODO: HANDLE THIS EXCEPTION")
+    finally:
+        await transport.close()
 
-    # parse the spi flash
-    if args.spi_flash:
-        with open(args.spi_flash, 'rb') as spi_flash_file:
-            spi_flash = FlashMemory(spi_flash_file.read())
-    else:
-        # Create memory containing default controller stick calibration
-        spi_flash = FlashMemory()
-
-    with utils.get_output(path=args.log, default=None) as capture_file:
-        # prepare the the emulated controller
-        factory = controller_protocol_factory(controller, spi_flash=spi_flash, reconnect = args.reconnect_bt_addr)
-        ctl_psm, itr_psm = 17, 19
-        transport, protocol = await create_hid_server(factory, reconnect_bt_addr=args.reconnect_bt_addr,
-                                                      ctl_psm=ctl_psm,
-                                                      itr_psm=itr_psm, capture_file=capture_file,
-                                                      device_id=args.device_id,
-                                                      interactive=True)
-
-        controller_state = protocol.get_controller_state()
-
-        # run veemotion
-        try:
-            await veemotion(controller_state)
-        finally:
-            logger.info('Stopping communication...')
-            await transport.close()
-
-
-if __name__ == '__main__':
-    # check if root
-    if not os.geteuid() == 0:
-        raise PermissionError('Script must be run as root!')
-
-    # setup logging
-    #log.configure(console_level=logging.ERROR)
-    log.configure()
-
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('controller', help='JOYCON_R, JOYCON_L or PRO_CONTROLLER')
-    parser.add_argument('-l', '--log', help="BT-communication logfile output")
-    parser.add_argument('-d', '--device_id', help='not fully working yet, the BT-adapter to use')
-    parser.add_argument('--spi_flash', help="controller SPI-memory dump to use")
-    parser.add_argument('-r', '--reconnect_bt_addr', type=str, default=None,
-                        help='The Switch console Bluetooth address (or "auto" for automatic detection), for reconnecting as an already paired controller.')
     args = parser.parse_args()
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        _main(args)
+    asyncio.get_event_loop().run_until_complete(
+        main(args)
     )

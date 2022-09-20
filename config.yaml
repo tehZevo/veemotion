@@ -1,0 +1,37 @@
+buttons:
+  KEY_SPACE: b    #jump
+  KEY_SHIFT: zl   #squid
+  BTN_LEFT: zr    #shoot
+  BTN_RIGHT: r    #bomb
+  KEY_Q: rstick   #special
+  KEY_ENTER: l    #match menu
+  KEY_E: plus
+  KEY_R: minus
+  KEY_TAB: x      #map
+  BTN_MIDDLE: lstick
+  #dpad
+  KEY_UP: up
+  KEY_DOWN: down
+  KEY_LEFT: left
+  KEY_RIGHT: right
+
+  #some other nice binds
+  KEY_LEFTBRACE: l
+  KEY_RIGHTBRACE: r
+  KEY_LEFTCTRL: a
+  KEY_LEFTALT: y
+
+left_stick:
+  left: KEY_A
+  right: KEY_D
+  up: KEY_W
+  down: KEY_D
+
+motion:
+  #TODO: not really sure what units these are in due to the units returned by evdev EV_REL
+  # theyre "degrees per second" per something
+  sensitivity: 1
+
+
+#TODO: gyro axis binding and sensitivity
+#TODO: switch mac address
