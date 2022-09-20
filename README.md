@@ -13,6 +13,4 @@ Mouse-and-keyboard-to-pro-controller adapter. Connects via bluetooth. Uses https
 * actually test this darn thing
 * automatically reconnect when disconnected
 * load/save switch mac address from/to config
-#TODO: custom(izeable) pro controller color ;^) (modify default flash memory bytes)
-
-#TODO: grab devices once stuff works
+* add pro controller color customization?

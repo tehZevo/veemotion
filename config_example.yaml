@@ -28,11 +28,6 @@ left_stick:
   down: KEY_D
 
 motion:
-  #TODO: not really sure what units these are in due to the units returned by evdev EV_REL
-  # theyre "degrees per second" per something
   sensitivity: 1
 
-#switch_mac: 7C:BB:8A:B5:A0:A5
-
-#TODO: gyro axis binding and sensitivity
-#TODO: switch mac address
+switch_mac: xx:xx:xx:xx:xx:xx

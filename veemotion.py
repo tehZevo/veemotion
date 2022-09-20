@@ -53,8 +53,8 @@ async def veemotion(controller_state):
         print(code, "up")
         button = find_button(code, config.buttons)
         if button is not None:
-            print("got", code, "pressing", button)
-            controller_state.button_state.set_button(button, True)
+            print("got", code, "releasing", button)
+            controller_state.button_state.set_button(button, False)
 
     listener = MKBListener(on_key_down, on_key_up, grab_devices=False)
     listener.listen()
@@ -80,8 +80,9 @@ async def veemotion(controller_state):
             logger.info("Connection re-established.")
 
 async def main(args):
+    switch_mac = config.switch_mac if "switch_mac" in config else None
     factory = controller_protocol_factory(Controller.PRO_CONTROLLER, spi_flash=FlashMemory())
-    transport, protocol = await create_hid_server(factory, interactive=True)
+    transport, protocol = await create_hid_server(factory, reconnect_bt_addr=switch_mac, interactive=True)
     controller_state = protocol.get_controller_state()
 
     try:
