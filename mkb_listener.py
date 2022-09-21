@@ -13,7 +13,8 @@ class MKBListener:
         self.on_key_down = on_key_down
         self.on_key_up = on_key_up
 
-        self.grabbed_devices = grab_devices
+        self.grabbed_devices = []
+        self.grab_devices = grab_devices
         self.devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
         #TODO: filter devices by capabilities (EV_KEY, EV_ABS, EV_REL)
 
