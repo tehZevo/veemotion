@@ -13,7 +13,7 @@ class MKBListener:
         self.on_key_down = on_key_down
         self.on_key_up = on_key_up
 
-        self.grab_devices = grab_devices
+        self.grabbed_devices = grab_devices
         self.devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
         #TODO: filter devices by capabilities (EV_KEY, EV_ABS, EV_REL)
 
@@ -37,7 +37,7 @@ class MKBListener:
     def ungrab_devices(self):
         for dev in self.grabbed_devices:
             dev.ungrab()
-            
+
     async def listen_on_device(self, device):
         async for event in device.async_read_loop():
             if event.type == ecodes.EV_KEY:
