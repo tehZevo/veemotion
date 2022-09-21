@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+from collections import defaultdict
 
 from evdev import ecodes
 from munch import munchify
@@ -29,6 +30,8 @@ with open("config.yaml", "r") as f:
 
 #TODO: grab devices once stuff works
 
+#TODO: emulate sticks
+
 #meh
 def find_button(code, obj):
     for key, value in obj.items():
@@ -37,6 +40,8 @@ def find_button(code, obj):
     return None
 
 async def veemotion(controller_state):
+    #TODO: think of a better way to do this
+    lstick = defaultdict(bool)
 
     def on_key_down(code):
         print(code, "down")
@@ -49,12 +54,21 @@ async def veemotion(controller_state):
             print("got", code, "pressing", button)
             controller_state.button_state.set_button(button, True)
 
+        stick_dir = find_button(code, config.left_stick)
+        if stick_dir is not None:
+            lstick[stick_dir] = True
+
     def on_key_up(code):
         print(code, "up")
+
         button = find_button(code, config.buttons)
         if button is not None:
             print("got", code, "releasing", button)
             controller_state.button_state.set_button(button, False)
+
+        stick_dir = find_button(code, config.left_stick)
+        if stick_dir is not None:
+            lstick[stick_dir] = False
 
     listener = MKBListener(on_key_down, on_key_up, grab_devices=False)
     listener.listen()
@@ -66,8 +80,14 @@ async def veemotion(controller_state):
         delta = np.array(listener.get_mouse_delta())
         delta = delta * config.motion.sensitivity
         delta = np.clip(delta, -2000, 2000)
-        print(delta)
+        print("gyro", delta)
         controller_state.imu_state.set_imu(0, 0, 0, 0, delta[1], delta[0])
+        #TODO: off by 1? oh well...
+        lstick_h = (int(lstick["right"]) - int(lstick["left"])) * 0x7ff + 0x800
+        lstick_v = (int(lstick["up"]) - int(lstick["down"])) * 0x7ff + 0x800
+        print("stick", lstick_h, lstick_v)
+        controller_state.l_stick_state.set_h(lstick_h)
+        controller_state.l_stick_state.set_v(lstick_v)
 
         try:
             await controller_state.send()

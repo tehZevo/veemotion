@@ -14,3 +14,10 @@ Mouse-and-keyboard-to-pro-controller adapter. Connects via bluetooth. Uses https
 * automatically reconnect when disconnected
 * load/save switch mac address from/to config
 * add pro controller color customization?
+* right joycon only mode so you can joycon + mouse (gl binding enough buttons though)
+* improve keybindings
+  * consider booyah!ing
+* fix create_future crash on python 3.10 (upstream joycontrol bug) (might be fixed now?)
+
+## Notes
+* may need to install python(3.9)-dev

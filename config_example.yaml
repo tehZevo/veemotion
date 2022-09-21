@@ -22,12 +22,10 @@ buttons:
   KEY_LEFTALT: y
 
 left_stick:
-  left: KEY_A
-  right: KEY_D
-  up: KEY_W
-  down: KEY_D
+  KEY_A: left
+  KEY_D: right
+  KEY_W: up
+  KEY_S: down
 
 motion:
   sensitivity: 1
-
-switch_mac: xx:xx:xx:xx:xx:xx
