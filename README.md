@@ -1,5 +1,5 @@
 # Veemotion
-*You lip-sync, we drip ink.*
+*You lip-synch, we drip ink.*
 
 Mouse-and-keyboard-to-pro-controller adapter. Connects via bluetooth. Uses https://github.com/tehZevo/joycontrol (thanks to upstream devs mart1nro and Poohl!)
 
