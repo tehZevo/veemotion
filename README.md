@@ -21,3 +21,8 @@ Mouse-and-keyboard-to-pro-controller adapter. Connects via bluetooth. Uses https
 
 ## Notes
 * may need to install python(3.9)-dev
+* you may need to keep a "safety mouse" around
+
+## Quotes
+tehZevo: What about gyro?
+Kaydax: I can't get into the menu to enable gyro!!!
