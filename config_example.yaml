@@ -3,12 +3,12 @@ buttons:
   KEY_LEFTSHIFT: zl   #squid
   BTN_LEFT: zr    #shoot
   BTN_RIGHT: r    #bomb
-  KEY_Q: rstick   #special
+  KEY_Q: r_stick   #special
   KEY_ENTER: l    #match menu
   KEY_E: plus
   KEY_R: minus
   KEY_TAB: x      #map
-  BTN_MIDDLE: lstick
+  BTN_MIDDLE: l_stick
   #dpad
   KEY_UP: up
   KEY_DOWN: down
