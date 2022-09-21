@@ -6,7 +6,7 @@ Mouse-and-keyboard-to-pro-controller adapter. Connects via bluetooth. Uses https
 ## Developers
 * [tehZevo](https://github.com/tehZevo): implementation
 * [Chrono](https://github.com/Chrono-byte): came up with the repo name :^)
-* [Kaydax](https://github.com/Kaydax): debugging/testing
+* [Kaydax](https://github.com/Kaydax): debugging/testing and *finding the final piece of the gyro puzzle*
 
 ## TODO
 * docs
