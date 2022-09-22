@@ -12,12 +12,15 @@ Mouse-and-keyboard-to-pro-controller adapter. Connects via bluetooth. Uses https
 * docs
 * actually test this darn thing
 * automatically reconnect when disconnected
+  * or quit program when disconnected until we have auto reconnect working...
 * load/save switch mac address from/to config
 * add pro controller color customization?
 * right joycon only mode so you can joycon + mouse (gl binding enough buttons though)
 * improve keybindings
   * consider booyah!ing
 * fix create_future crash on python 3.10 (upstream joycontrol bug) (might be fixed now?)
+* create OS image that autolaunches veemotion for raspberry pi usage
+* rename pitch/yaw/roll to gyro x/y/z and x/y/z to accel x/y/z?
 
 ## Notes
 * may need to install python(3.9)-dev
