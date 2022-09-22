@@ -157,7 +157,7 @@ async def veemotion(controller_state):
 
     while True:
         delta = np.array(listener.get_mouse_delta())
-        delta = delta * config.motion.sensitivity
+        delta = delta * config.motion.sensitivity / 1000 #TODO: remove hardcoded sensitivity multiplier
 
         #setting last value seems to affect yaw a lot, and pitch some?
         #setting second to last value seems to not do anything (wrong axis?)
@@ -166,7 +166,7 @@ async def veemotion(controller_state):
 
         #pitch = np.sin(time.time()) * np.pi / 4 #auto pitch up/down +-45 degrees
         pitch += delta[1] #mouse y based pitch up/down (NOTE: sensitivity weird)
-        pitch = np.clip(pitch, -45, 45)
+        pitch = np.clip(pitch, -np.pi/4, np.pi/4)
         acc_z = np.cos(pitch) * -1000
         acc_x = np.sin(pitch) * -1000
 
@@ -199,8 +199,6 @@ async def veemotion(controller_state):
         # controller_state.imu_state.set_imu(0, 0, 0, *[np.random.normal() for _ in range(3)]) #does not spaz out
         # controller_state.imu_state.set_imu(*[np.random.normal() for _ in range(3)], 0, 100, 0) #does not spaz out (maybe because no pyr)
         # controller_state.imu_state.set_imu(acc_x, 0, acc_z, 0, 0, 100)
-
-        gyro_aim(controller_state.imu_state, delta[0], delta[1])
 
         #TODO: off by 1? oh well...
         lstick_h = (int(lstick["right"]) - int(lstick["left"])) * 0x7ff + 0x800
